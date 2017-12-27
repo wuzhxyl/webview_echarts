@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+  简单版本的温度历史曲线
+  含舒适区的配置
+  数据刷新
+  区间设置
+  ..
+
+ -->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Insert title here</title>
+    <style>
+html,body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0;
+    align: left;
+    valign: left;
+
+}
+</style>
+    <!-- 引入 ECharts 文件 -->
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ZUONbpqGBsYGXNIYHicvbAbM"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+
+    <script>
+        option = null;
+        function getMyChart() {
+            return echarts.init(document.getElementById('main'));
+        }
+
+        function refresh() {
+            var myChart = getMyChart();
+            myChart.setOption(option);
+        }
+
+        function comparea() {
+            if (option.series[0].markArea) {
+                option.series[0].markArea = null;
+            } else {
+                var markarea = {
+                    data: [
+                        [
+                            {
+                                yAxis: 16
+                            },
+                            {
+                                yAxis: 25
+                            }
+                        ],
+                    ],
+                    itemStyle: {
+                        normal: {
+                            color: 'rgba(0,168,135,0.2)'
+                        }
+                    }
+                }
+               option.series[0].markArea = markarea
+            }
+           refresh();
+        }
+
+        function getOption() {
+            option = {
+                title: {
+                    text: '未来一周气温变化', // 标题
+                    subtext: '气温'     // 子标题
+                },
+                tooltip: {
+                    trigger: 'axis', // 类目图中使用
+                },
+                legend: {
+                    show: false,
+                    data:['一周气象'] // t图例组件显示不同序列的标记，颜色和名字。可以点击图例来控制显示哪个序列
+                },
+                xAxis:  {
+                    type: 'category', //类目轴，通过离散的类目数据，必须设置data数据
+                    boundaryGap: false,
+                    data: ['周一','周二','周三','周四','周五','周六','周日'] // 类目数据.
+                },
+                yAxis: {
+                    type: 'value', //数值轴， 适用于连续数据
+                    axisLabel: {
+                        formatter: '{value} °C' // 刻度标签的内容格式器，支持字符串模板和回调函数的形式
+                    },
+                    min: -10,
+                    max: 40,
+                    interval: 5
+                },
+                series: [
+                    {
+                        name:'一周气象', //系列名称，用于tooltip的显示，legend的图例筛选，用于指定对应的系列
+                        type:'line',
+                        data:[11, 11, 15, 13, 12, 13, 10], // 当只有一个轴为类目轴，数据可以简化为一维数组.
+                        markPoint: { //图标标注
+                            data: [
+                                {type: 'max', name: '最大值'},
+                                {type: 'min', name: '最小值'}
+                            ]
+                        },
+                    },
+                ]
+            };
+
+            return option
+        }
+
+        function setRange(min, max, step) {
+            option.yAxis.min = min;
+            option.yAxis.max = max;
+            option.yAxis.interval = step
+            refresh();
+        }
+    </script>
+</head>
+<body>
+
+<div id="main" style="height: 100%; width: 100%; border: 0px; text-align: left; align: left; valign: left;"></div>
+
+<script type="text/javascript">
+    function postDelayToShow() {
+        // 延时动画.
+        var myChart = getMyChart();
+        myChart.showLoading();
+        getOption();
+        setTimeout(function () {
+            myChart.hideLoading();
+            refresh();
+        }, 2000);
+    }
+
+    postDelayToShow()
+</script>
+
+</body>
+</html>
